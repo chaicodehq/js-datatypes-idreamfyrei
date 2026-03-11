@@ -10,7 +10,7 @@
  *   { name, email, phone, age, pincode, state, agreeTerms }
  *
  * Validation Rules:
- *   1. name: must be a non-empty trimmed string, min 2 chars, max 50 chars
+ *   1. name: must be a non-empty trimmed string, min 2  chars, max 50 chars
  *      Error: "Name must be 2-50 characters"
  *
  *   2. email: must be a string containing exactly one "@" and at least one "."
@@ -60,7 +60,66 @@
  *     pincode: "0123", state: null, agreeTerms: false
  *   })
  *   // => { isValid: false, errors: { name: "...", email: "...", ... } }
+ * { name, email, phone, age, pincode, state, agreeTerms }
  */
 export function validateForm(formData) {
   // Your code here
+  const { name, email, phone, age, pincode, state, agreeTerms } = formData;
+
+  const errors = {};
+
+  // name
+  if(typeof name !== "string" || name.trim().length < 2 || name.trim().length > 50){
+    errors.name = "Name must be 2-50 characters";
+  } 
+
+  // email
+  if (typeof email !== "string") errors.email = "Invalid email format"
+  else{
+    const atIndex = email.indexOf('@');
+    const atlastIndex = email.lastIndexOf('@');
+    const dotIndex = email.indexOf('.', atIndex);
+
+    if ( atIndex === -1 || atlastIndex !== atIndex || dotIndex === -1){
+      errors.email = "Invalid email format"
+    }
+  }
+
+  // ph
+  if (typeof phone !== "string" || phone.trim().length !== 10 ) errors.phone = "Invalid Indian phone number"
+  else {
+    const validStart = ["6" , "7", "8", "9"].includes(phone[0]);
+    const hasDigits = /^\d{10}$/.test(phone);
+
+    if( !validStart || !hasDigits) errors.phone = "Invalid Indian phone number";
+  }
+
+//  age
+let numAge = age;
+if (typeof age === "string") {
+  numAge = parseInt(age.trim())
+}
+if (isNaN(numAge) || !Number.isInteger(numAge) || numAge < 16 || numAge > 100 ) errors.age = "Age must be an integer between 16 and 100"
+
+// pincode
+if(typeof pincode !== "string" || pincode.trim().length !== 6 || pincode.startsWith("0") || !/^\d{6}$/.test(pincode)) errors.pincode = "Invalid Indian pincode"
+
+
+// state
+  const stateValue = state?.trim?.() ?? "";
+
+  if (stateValue === "") {
+    errors.state = "State is required";
+  }
+
+  // agreeTerms: agreeTerms: must be truthy (Boolean(agreeTerms) === true).
+  if (!Boolean(agreeTerms)) {
+    errors.agreeTerms = "Must agree to terms";
+  }
+
+    return {
+    isValid: Object.keys(errors).length === 0,
+    errors
+  };
+
 }
